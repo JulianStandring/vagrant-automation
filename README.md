@@ -3,30 +3,36 @@ A load balanced "Hello World" website project configured with Ansible using a Va
 
 100% Minimal Viable Product, it would needs much more to be hardened and production ready. This is intended for demonstration only.
 
-- Use Vagrant to create three virtual machines (one load balancer and two web servers):
-  - Configure networking
-  - Configure VM Access (`vagrant ssh`, no password for sudo if admin group or vagrant user)
-  - Provision Ansible and run playbooks
-- Use Ansible to:
-  - Install NGINX
-  - Configure NGINX as a load balancer
-  - Configure NGINX as a web server (i.e. modify the home page)
-  - Enforce configuration (i.e. run manually)
+## Goal
+To demonstrate an Infrastructure as Code solution using vagrant and ansible that runs a "Hello World" website.
 
+This will consist of
+- 3 x Vagrant virtual machines (one loadbalancer and two webservers):
+  - Using `ubuntu/bionic64` box type
+  - Configured with static ips
+  - Configured with port forwarding
+  - Provisioned using Ansible
+- Ansible used for configuration management:
+  - Installing and configuring NGINX
+    - as a loadbalancer
+    - as a webserver
+  - Configure VM Access (`vagrant ssh`, no password for sudo if admin group or vagrant user)
+  - Enforce configuration (i.e. show how ansible can make changes)
 
 # Read it
 ## This isn't
 - Secure
 - Scalable
 - The only way of doing it
-- Instruction for "how to setup a terminal or install software" (if there are ommissions that would be helpful please let me know)
+- Instructions on "how to setup your terminal or install software"
 - The only resource you should use (see links)
 
-## Installation
-This project was completed using MacOS High Sierra (10.13) and I use `brew` as a package manager, for example, I was able to install ansible by running `brew install ansible` ([see here for brew](https://brew.sh/)) and check details by running `brew info ansible`.
+## What do you need to run it?
+This project was witten using MacOS High Sierra (10.13) and `brew` as a package manager, for example, ansible could be installed by running `brew install ansible` and version checked by running `brew info ansible` ([see here for brew](https://brew.sh/)).
 
-The following software is central to this project. If you can get version numbers using the shell command then you should be ok to continue and everything should be installed correctly. If you're having trouble please check the maintainer's website.
+The following software is central to this project but this project also assumes you have at least intermediate knowledge of a shell terminal. If you can run the shell commands successfully then the software should be installed ok. This means you can continue and everything should hopefully work. If you're having trouble please check the maintainer's website for install instructions.
 
+I used the following versions when testing this project worked.
 Software | Shell command | Version used here | Maintainer Website
 -----------|--------------------|--------|-----
 VirtualBox | `virtualbox --help` | 6.0.14  | [website link](https://www.virtualbox.org/wiki/Downloads)
@@ -35,69 +41,75 @@ Ansible | `ansible --version` | 2.9.2  | [website link](https://docs.ansible.com
 
 ## Links
 Additional links that might also be worth reading:
-- [Ansible Vagrant Guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_vagrant.html)
 - [Vagrant Docs](https://www.vagrantup.com/docs/)
+- [Ansible Vagrant Guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_vagrant.html)
 - [NGINX Docs](https://nginx.org/en/docs/)
-- Something something... medium? blogs? [WIP - check browser history when done]
-
+- External links/reading that helped inform my understanding and might help you with setup issues
+  - https://www.booleanworld.com/configure-nginx-load-balancer/
+  - https://www.mydailytutorials.com/ansible-template-module-examples/
+  - https://codelike.pro/how-to-configure-nginx-using-ansible-on-ubuntu/
 
 # Run it
-Assuming you have installed the relevant software and have an idea what we're trying to do then let's create.
+Assuming you have installed the relevant software and feel ready to go then let's create.
 
-- STEP 1: Git clone
-  - First of all clone this repo locally, e.g. `git clone https://github.com/JulianStandring/vagrant.git`.
+## Steps
+- STEP 1: Git clone to get the code
+  - First of all clone this repo locally, e.g. `git clone git@github.com:JulianStandring/vagrant.git` _assuming you have ssh setup! (other download methods are available)_.
 - STEP 2: Vagrant up
-  - Make sure you're in the root of the repo you've just cloned and then run `vagrant up`. This will take some time to download all the necessary resources but should do everything you need.
+  - Make sure you're in the root of the cloned repo
+  - Run `vagrant up`, this uses the `Vagrantfile` to start everything up
+  - Wait. This will take some time to download all the necessary resources but should do everything you need.
 
-Three virtual machines are created, assigned ip addresses, ports are forwarded from your computer to the virtual machines and ansible runs some configuration tasks like installing NGINX.
+Did you get any errors? :crossed_fingers:
+:x: Hopefully the error messages helped. Please comment and get in touch if help is needed.
+:green_heart: As expected, I mean what could have gone wrong? right? :relieved:
+
+## Check it
+Take a look at the README under `/tests`. It suggests what to do other than checking, http://localhost:8080.
+
+
+# Change it
+Assuming everything worked you might be thinking about how to do more and where to look next. Let me explain how this project is laid out. Break it down into components and tell you where to look to make certain types of changes.
+
+## Folder structure
+```
+(root)
+.
+├── ansible
+│  └── templates
+└── tests
+```
+
+There's a `Vagrantfile` in the root folder. This defines the infrastructure and provisioning method.
+
+As ansible is used for provisioning and configuring it gets it's own folder, `ansible`. This contains the yaml playbooks written for this project. Under this there is a `templates` folder. This contains files that can be used by playbooks, in this case to configure nginx.
+
+The `tests` folder contains ways to check what good looks like but is loosely coupled and relies more on manual effort. If automated git commit hooks could be used to trigger them and if they were to fail so would the commit creation. This can help enforce consistency for a larger project.
+
+## Vagrant
+### Adding more machines
+Virtual machines can be defined in many ways. In the `Vagrantfile` there is a `(1..2).each do |i|` block. This can easily be used to increase the number of webservers created.
+However, other changes would be required due to the static IP configuration that's used in the `lb.nginx.conf.tmpl`. Planning for these types of changes in advance can be time consuming and not necessary for an MVP. If this were to change then this could be improved by using templates to dynamically update the configuration based on the number of webservers created.
+
+If the addition of a database was required it could be provisioned in one of the two ways demonstrated. To configure the database a set of ansible playbooks would be required too. Most changes once the vms and networking is set by vagrant can be made by ansible.
 
 ## Ansible
-When you ran `vagrant up` the Vagrantfile used ansible to configure the virtual machines. You can also run these tasks or playbooks again to enforce configuration or make changes. You can run these manually. [WIP - need some examples]
+There's a README under `/ansible` that explains more about that code.
 
-## Troubleshooting
-Beyond the maintainer install docs here are a few things that I found useful to know while setting this up and wrote down as notes. Always read the error messages and hopefully some searches for them will provide workarounds or solutions if you have problems setting up this project.
+## NGINX
+NGINX is a flexible webserver that can also be configured to run as a loadbalancer. Other software could have been used but this was picked as it's fairly easy to get started with and has a lot of flexibility.
 
-### I can't run ansible because ssh hosts can't be added to the approved list?!?!
-Are you in the correct folder? Try setting the following to false, `ANSIBLE_HOST_KEY_CHECKING`, e.g. `ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook ... ...`. Alternatively this is set in `ansible/ansible.cfg` but only used if running the command from that working directory.
+Each config file was taken from the default installation, with the comment lines removed, i.e. `grep -v ^.*#`. The comments have useful information but it's much smaller and easier to read with them gone. With these abbreviated config files the following lines were added:
 
-### How do I create an inventory file when using vagrant?!?!
-When you run `vagrant provision` an inventory is generated that you can reference. It is: `.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory`. Use the `-i` flag to reference it, e.g. `ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory playbook.yml -b`.
+To `nginx.conf` aka `lb.nginx.conf.tmpl` (includes line numbers):
+```
+ 12         upstream helloworld {
+ 13           server 192.168.10.21:80;
+ 14           server 192.168.10.22:80;
+ 15         }
+```
 
-
-# Test it 
-What behaviours do we care about? a.k.a. Tests that tell us what we should expect when doing specific things. What follows are some examples written in a [Given-When-Then](https://www.agilealliance.org/glossary/gwt/) format, these are only examples and pretty much mirror the bullet points in the summary.
-
-## Page Content
-**Given** a user accesses the website on http://localhost:8080
-
- **and** uses cURL or a web browser
-
-**Then** they get served a "Hello World" page
-
-## Load Balancer
-**Given** traffic goes through a load balancer
-
- **and** HTTP requests are balanced using round-robin
-
-**Then** the page will be served by alternating webservers
-
-## HTTP Health Check
-**Given** we have two web servers behind a load balancer
-
-**When** we send them HTTP requests avoiding the loadbalancer
-
-**Then** we get a 200 response from both
-
-## Config management
-**Given** we use ansible to ensure configuration is applied
-
-**When** running ansible-playbooks repeatedly
-
-**Then** changes are successfully applied
-
-## VM Spec
-**Given** that we expect a particular base image to be used when creating the virtual machines
-
-**When** we run `vagrant up`
-
-**Then** the expected base image is used
+To `sites-available/helloworld` aka `lb.sites-enabled.tmpl` (includes line numbers):
+```
+ 13                 proxy_pass http://helloworld;
+```
