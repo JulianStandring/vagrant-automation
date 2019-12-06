@@ -1,0 +1,44 @@
+---
+- hosts: all
+  tasks:
+    - name: check for latest apt copy of nginx
+      apt: name=nginx state=latest
+    - name: start nginx
+      service:
+          name: nginx
+          state: started
+- hosts: loadbalancer 
+  tasks:
+    - name: update nginx.conf for upstream servers
+      copy:
+        src: ./templates/lb.nginx.conf.tmpl
+        dest: /etc/nginx/nginx.conf
+      become: yes
+    - name: copy lb site config
+      copy:
+        src: ./templates/lb.sites-enabled.tmpl
+        dest: /etc/nginx/sites-available/lb
+      become: yes
+    - name: create symlink to use lb site config as default
+      file:
+        src: /etc/nginx/sites-available/lb
+        dest: /etc/nginx/sites-enabled/default
+        state: link
+      become: yes
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+      become: yes
+- hosts: webserver-* 
+  tasks:
+    - name: copy helloworld page to the web root
+      template:
+        src: ./templates/webserver.index.html.tmpl
+        dest: /var/www/html/index.html
+      become: yes
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+      become: yes
