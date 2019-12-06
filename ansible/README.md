@@ -17,6 +17,10 @@ The `template` module is potentially more useful. This allowed a dynamic `invent
 ## Troubleshooting
 Beyond the install docs from ansible here are a few things that I found useful to know while setting this up and wrote down as notes. Always read the error messages and hopefully some searches for them will provide workarounds or solutions if you have problems setting up this project.
 
+Have you tried using verbose mode? If you check the provisioning block in the `Vagrantfile` there's an `ansible.verbose = "v"` line commented out. Try uncommenting it and hopefully it'll help you with more detail into what's happening.
+
+If you're running ansible manually you can add `-v` switches to get verbose output. 
+
 ### I can't run ansible because ssh hosts can't be added to the approved list?!?!
 Are you in the correct folder? Try setting the following to false, `ANSIBLE_HOST_KEY_CHECKING`, e.g. `ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook ... ...`. Alternatively this is set in `ansible/ansible.cfg` but only used if running the command from that working directory.
 

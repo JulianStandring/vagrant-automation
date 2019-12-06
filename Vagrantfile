@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
     lb.vm.network "private_network", ip: "192.168.10.10"
 
     config.vm.provision "ansible" do |ansible|
-      ansible.verbose = "v"
+#      ansible.verbose = "v"
       ansible.become = true
       ansible.playbook = "./ansible/helloworld.yml"
     end
@@ -18,7 +18,7 @@ Vagrant.configure("2") do |config|
       webserver.vm.network "private_network", ip: "192.168.10.2#{i}"
 
       webserver.vm.provision "ansible" do |ansible|
-        ansible.verbose = "v"
+#        ansible.verbose = "v"
         ansible.become = true
         ansible.playbook = "./ansible/helloworld.yml"
       end
