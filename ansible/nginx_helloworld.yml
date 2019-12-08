@@ -7,7 +7,7 @@
       service:
           name: nginx
           state: started
-- hosts: loadbalancer 
+- hosts: loadbalancer
   tasks:
     - name: update nginx.conf for upstream servers
       copy:
@@ -30,7 +30,7 @@
         name: nginx
         state: restarted
       become: yes
-- hosts: webserver-* 
+- hosts: webserver-*
   tasks:
     - name: copy helloworld page to the web root
       template:

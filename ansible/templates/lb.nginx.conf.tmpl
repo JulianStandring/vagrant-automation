@@ -9,10 +9,10 @@ events {
 
 http {
 
-        upstream helloworld {
-          server 192.168.10.21:80;
-          server 192.168.10.22:80;
-        }
+	upstream helloworld {
+		server 192.168.10.21:80;
+		server 192.168.10.22:80;
+	}
 
 	sendfile on;
 	tcp_nopush on;

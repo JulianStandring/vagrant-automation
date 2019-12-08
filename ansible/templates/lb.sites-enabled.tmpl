@@ -10,7 +10,7 @@ server {
 	server_name _;
 
 	location / {
-                proxy_pass http://helloworld;
+		proxy_pass http://helloworld;
 		try_files $uri $uri/ =404;
 	}
 
