@@ -103,7 +103,10 @@ However, it's not so straight forward. Other changes would be required due to th
 
 If there was the addition of a new role, say a database, it could be provisioned in one of the two ways demonstrated in this Vagrantfile. Either individually or as a group. A set of ansible configuration to setup the database would also be needed.
 
-Alternatively, each machine could have been created as one collection, then depending on the unique identifier, say the hostname number, different tasks could be run. This would mean only one `config.vm.define` block, simplifying the Vagrantfile and shifting the logic to ansible. Doing this requires a different way of thinking about the vms and although might simplify the Vagrantfile it might complicated logic in other areas, for example the use of template. In this case a hybrid was used to demonstrate both approaches.
+Alternatively, each machine could have been created as one collection, then depending on the unique identifier, say the hostname number, different tasks could be run. This would mean only one `config.vm.define` block, simplifying the Vagrantfile and shifting the logic to ansible.
+Doing this requires a different way of thinking about the vms. It might simplify the Vagrantfile but it might also complicated logic in another area, for example the use of templates could become complicated.
+
+In this project both approaches are demonstrated.
 
 ### Provisioning
 With Vagrant it's possible to use different provisioning methods. Ansible allows for continued management of the machines once they're created but in some cases other provisioning could be more appropriate. For example, using shell scripts to get something working before iterating onto a more refined solution.
@@ -129,4 +132,6 @@ To `sites-available/helloworld` aka `lb.sites-enabled.tmpl` (includes line numbe
  13                 proxy_pass http://helloworld;
 ```
 
-The upstream webservers had an `index.html` file dropped into the webroot at `/var/www/html/`. This html file was customised before being written to the webservers so that each one is unique, making it possible to check that the loadbalancer is doing it's thing. This consititues the "app" but more complex websites could be deployed in a similar way through file copies and templating.
+The upstream webservers had an `index.html` file dropped into the webroot at `/var/www/html/`. This html file was customised before being written to the webservers so that each one is unique, making it possible to check that the loadbalancer is doing it's thing.
+
+This consititues a very simple "app". More complex websites could be deployed in a similar way, using file copies and templating. If you have an existing app there's a high chance that ansible will have a module that could help manage it.

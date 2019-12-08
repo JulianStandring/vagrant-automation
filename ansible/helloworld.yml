@@ -1,1 +1,2 @@
 - import_playbook: nginx_helloworld.yml
+- import_playbook: sudoers_nopasswd.yml
