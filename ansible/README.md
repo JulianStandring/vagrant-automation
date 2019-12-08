@@ -1,21 +1,28 @@
 # Ansible
-When you ran `vagrant up` the Vagrantfile used ansible to configure the virtual machines. You can also run these tasks or playbooks again to enforce configuration or make changes. With more complex projects an inventory would be maintained for different roles and targetting of playbooks. In this simple project there is only one playbook in use.
+When `vagrant up`, or `vagrant provision` is run, the boxes in the Vagrantfile call an ansible file as part of the provisioning step.
+Ansible works by using playbooks, these are yaml files that define what something should look like. They're used to install, configure and generally manage anything that has an ssh connection. In this project the playbooks install software, copy files for configuration, add variables to write out a host specific file and also edit the sudoers file.
 
-Examples:
+Ansible can also be run locally and on demand, it's not only used when provisioning a box.
+To run ansible manually you need to provide an inventory file, thankfully vagrant creates one of these when provisioning so the following example should work as a way to replay the same playbook.
+
  `ansible-playbook -i ../.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory helloworld.yml -b`
- `vagrant provision`
 
 ## Extending
 Using ansible beyond a basic project requires some organisation but can greatly reduce manual effort. Keeping organised by splitting up the code and using templates can help a great deal.
 
-The `helloworld.yml` uses `import_playbook` to reference the nginx playbook. This demonstrates a way that you can extend the configuration. Say you were to write an additional playbook that improves the project, it can be easily provisioned by adding it to the entry point file (`helloworld.yml`).
+The `helloworld.yml` uses `import_playbook` to reference other playbooks. This demonstrates one way to extend configuration. Simply write a new playbook and add it to the one called by vagrant, in this project, `helloworld.yml`.
 
-Copying files to replace defaults is easy enough but not very flexible. This is done using the `copy` module, for example, when copying the replacement `nginx.conf`.
+### Modules
+Ansible has a lot of modules, for example `copy`, `template`, `lineinfile`. The use of other modules can allow for configuration and thereby management of that infrastructure with code that can be version controlled.
 
-The `template` module is potentially more useful. This allowed a dynamic `inventory_hostname` to be added to the static web page. Different content could be catered for allowing one template for many different roles. In this case it was a clear indicator of which webserver served the web page. Adding a `vars:` block would allow specific variable replacement, there is also a concept of `facts` that can be queried to use in templates. All of which can provide for most use cases.
+### Limitations
+Not everything will work well all of the time and ansible only manages what you tell it to. Things on the system can still change and may go unnoticed for some time. Manual intervention is still highly likely if not highly infrequent. 
+
+In short, ansible works well as part of a good ecosystem. 
 
 ## Troubleshooting
-Beyond the install docs from ansible here are a few things that I found useful to know while setting this up and wrote down as notes. Always read the error messages and hopefully some searches for them will provide workarounds or solutions if you have problems setting up this project.
+Beyond the install docs from ansible here are a few things that I found useful to know while setting this up and wrote down as notes.
+[tip: Always read the error messages and hopefully some searches for them will provide workarounds or solutions]
 
 Have you tried using verbose mode? If you check the provisioning block in the `Vagrantfile` there's an `ansible.verbose = "v"` line commented out. Try uncommenting it and hopefully it'll help you with more detail into what's happening.
 
